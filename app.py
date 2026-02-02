@@ -2,40 +2,10 @@ import streamlit as st
 import pandas as pd
 import io
 
-# 1. Konfigurasi Halaman
+# 1. Konfigurasi Halaman (Profesional)
 st.set_page_config(page_title="Dashboard SKTB 2026", page_icon="🏫", layout="wide")
 
-# 2. Gaya Visual (CSS) - Tema Profesional & Moden
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    
-    .main { background-color: #f8f9fa; }
-    
-    /* Header Style */
-    .header-box {
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        text-align: center;
-        border-bottom: 5px solid #007bff;
-        margin-bottom: 30px;
-    }
-    
-    /* Card Style */
-    .info-card {
-        background: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        border-left: 10px solid #007bff;
-    }
-    </style>
-    """, unsafe_allow_index=True)
-
-# 3. Data Program (CSV Internal)
+# 2. Data Program SKTB
 csv_data = """Tarikh,Hari,Program,Link
 08/01,Khamis,Taklimat Ibu Bapa Tahun 1 & Prasekolah 2026,#
 12/01,Isnin,Pelancaran Amalan Sek. Penyayang 2026,#
@@ -50,40 +20,37 @@ csv_data = """Tarikh,Hari,Program,Link
 
 df = pd.read_csv(io.StringIO(csv_data))
 
-# 4. Sidebar Interaktif
+# 3. Sidebar Interaktif
 with st.sidebar:
     st.header("🔍 Menu Carian")
-    # Dropdown untuk pilih program secara interaktif
     pilihan_program = st.selectbox("Pilih Program Untuk Detail:", ["Semua Program"] + list(df['Program']))
     st.divider()
-    st.info("Pilih program untuk melihat tarikh dan dokumen berkaitan.")
+    st.info("Pilih program untuk melihat tarikh dan maklumat berkaitan.")
 
-# 5. Paparan Utama
-st.markdown('<div class="header-box"><h1 style="color: #1a1a1a; margin-bottom:0;">📊 Dashboard Program / Aktiviti SKTB 2026</h1><p style="color: #666;">Sistem Pengurusan Aktiviti Digital Sekolah</p></div>', unsafe_allow_index=True)
+# 4. Paparan Utama
+st.title("📊 Dashboard Program / Aktiviti SKTB 2026")
+st.write("Sistem Pengurusan Aktiviti Digital Sekolah")
+st.divider()
 
 if pilihan_program == "Semua Program":
-    # Paparan Keseluruhan dalam bentuk jadual yang cantik
-    st.subheader("📅 Senarai Penuh Aktiviti")
+    # Paparan Senarai Penuh
+    st.subheader("📅 Jadual Keseluruhan Aktiviti")
     st.dataframe(df[['Tarikh', 'Hari', 'Program']], use_container_width=True, hide_index=True)
 else:
-    # Paparan Interaktif bila satu program dipilih
+    # Paparan Detail Program yang dipilih
     data_program = df[df['Program'] == pilihan_program].iloc[0]
     
-    st.markdown(f"""
-        <div class="info-card">
-            <h2 style="color: #007bff; margin-top:0;">{data_program['Program']}</h2>
-            <hr>
-            <p style="font-size: 18px;"><b>📅 Tarikh:</b> {data_program['Tarikh']}</p>
-            <p style="font-size: 18px;"><b>🗓️ Hari:</b> {data_program['Hari']}</p>
-        </div>
-    """, unsafe_allow_index=True)
+    st.subheader(f"📌 Detail: {data_program['Program']}")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info(f"**📅 Tarikh:** {data_program['Tarikh']}")
+    with col2:
+        st.info(f"**🗓️ Hari:** {data_program['Hari']}")
     
-    st.write("") # Jarak
     if data_program['Link'] != "#":
-        st.link_button(f"📂 Buka Dokumen / Gambar {pilihan_program}", data_program['Link'], use_container_width=True)
+        st.link_button(f"📂 Buka Dokumen {pilihan_program}", data_program['Link'], use_container_width=True)
     else:
-        st.warning("⚠️ Pautan dokumen atau gambar belum dikemaskini untuk program ini.")
+        st.warning("⚠️ Pautan dokumen atau gambar belum dikemaskini.")
 
-# 6. Footer
 st.divider()
 st.caption("© 2026 Dashboard SKTB - Diuruskan oleh Unit Digital Sekolah")
